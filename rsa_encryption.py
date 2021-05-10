@@ -35,12 +35,12 @@ def rsa_set_keys(p: int, q: int, e: int, encoding_dict: dict):
     phi = euler_func(p, q)
     if not is_prime(e):
         raise ValueError("e должно быть простым числом ")
-    elif e <= phi:
+    elif e >= phi:
         raise ValueError("e должно быть быть меньше phi")
     elif np.gcd(phi, e) != 1:
         raise ValueError("e должно быть взаимно простым с phi")
     else:
-        n = np.mod(p * q)
+        n = abs(p * q)
         if n < len(encoding_dict):
             raise ValueError("mod(p * q) должен быть больше чем длина словаря языка шифрования")
         open_key = {"e": e, "n": n}
