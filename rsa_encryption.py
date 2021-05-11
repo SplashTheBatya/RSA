@@ -29,7 +29,7 @@ def gcd_extended(a, b):
     return gcd, x, y
 
 
-def rsa_set_keys(p: int, q: int, e: int, encoding_dict: dict):
+def rsa_set_open_key(p: int, q: int, e: int, encoding_dict: dict):
     if not is_prime(p) or not is_prime(q):
         raise ValueError("p и q должны быть простыми")
     phi = euler_func(p, q)
@@ -44,11 +44,27 @@ def rsa_set_keys(p: int, q: int, e: int, encoding_dict: dict):
         if n < len(encoding_dict):
             raise ValueError("mod(p * q) должен быть больше чем длина словаря языка шифрования")
         open_key = {"e": e, "n": n}
+
+    return {"open_key": open_key}
+
+
+def rsa_get_secret_key(p: int, q: int, e: int, encoding_dict: dict):
+    if not is_prime(p) or not is_prime(q):
+        raise ValueError("p и q должны быть простыми")
+    phi = euler_func(p, q)
+    if not is_prime(e):
+        raise ValueError("e должно быть простым числом ")
+    elif e >= phi:
+        raise ValueError("e должно быть быть меньше phi")
+    elif np.gcd(phi, e) != 1:
+        raise ValueError("e должно быть взаимно простым с phi")
+    else:
         gcd, x, y = gcd_extended(e, phi)
         d = (x % phi + phi) % phi
+        n = abs(p * q)
         secret_key = {"d": d, "n": n}
 
-    return {"open_key": open_key, "secret_key": secret_key}
+    return {"secret_key": secret_key}
 
 
 def rsa_encode(massage: str, open_key: dict, encoding_dict: dict):
@@ -70,12 +86,3 @@ def rsa_decode(encoded_numeric_list: list, secret_key: dict, encoding_dict: dict
     massage_list = decoder(decoded_numeric_list, encoding_dict)
 
     return ''.join(massage_list)
-
-
-
-
-
-
-
-
-
